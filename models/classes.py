@@ -1,5 +1,4 @@
 #encoding:utf-8
-
 import logging
 
 import numpy as np
@@ -7,7 +6,7 @@ import numpy as np
 from .base import BaseDataModel
 from .exceptions import UserNotFoundError, ItemNotFoundError
 
-logger = logging.getLogger("crab")
+logger = logging.getLogger("xstar")
 
 class MatrixPreferenceDataModel(BaseDataModel):
     def __init__(self, dataset):
@@ -26,7 +25,25 @@ class MatrixPreferenceDataModel(BaseDataModel):
         return self.index.shape
 
     def build_model(self):
-        pass
+        self._user_ids = np.asanyarray(self.dataset.keys())
+        self._user_ids.sort()
+
+        self._item_ids = []
+        for item in self.dataset.itervalues():
+            self._item_ids.extend(items.keys())
+
+        self._item_ids = np.unique(np.array(self._item_ids))
+        self._item_ids.sort()
+
+        self.max_pref = -np.inf
+        self.min_pref = np.inf
+
+        logger.info("creating matrix for %d users and %d items" % (self._user_ids.size, self._item_ids.size))
+
+        self.index = np.empty(shape=(self._user_ids, self._item_ids))
+        for user_num, user_id in enumerate(self._user_ids):
+            if user_num % 2 == 0:
+                pass
 
     def user_ids(self):
         pass
@@ -80,4 +97,4 @@ class MatrixPreferenceDataModel(BaseDataModel):
         pass
 
     def __str__(self):
-        pass
+        return unicode(self).encode('utf-8')
