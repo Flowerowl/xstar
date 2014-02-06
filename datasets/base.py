@@ -35,4 +35,3 @@ def load_movielens100k(load_timestamp=False):
         data_t.append((item_id, label))
     data_titles = dict(data_t)
     return Bunch(data=data_movies, item_ids=data_titles, user_ids=None)
-
