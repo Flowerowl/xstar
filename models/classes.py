@@ -38,7 +38,8 @@ class MatrixPreferenceDataModel(BaseDataModel):
         self.max_pref = -np.inf
         self.min_pref = np.inf
 
-        logger.info("creating matrix for %d users and %d items" % (self._user_ids.size, self._item_ids.size))
+        logger.info("creating matrix for %d users and %d items" % \
+                    (self._user_ids.size, self._item_ids.size))
 
         self.index = np.empty(shape=(self._user_ids, self._item_ids))
         for user_num, user_id in enumerate(self._user_ids):
@@ -103,22 +104,73 @@ class MatrixPreferenceDataModel(BaseDataModel):
                             if not np.isnan(preference)], key=lambda user: - user[1])
 
     def preference_value(self):
-        pass
+        item_id_loc = np.where(self._item_ids == item_id)
+        user_id_loc = np.where(self._user_ids == user_id)
+        if not user_id_loc[0].size:
+            raise UserNotFoundError('user_id in the model not found')
+        if not item_id_loc[0].size:
+            rasie ItemNotFoundError('item_id in the model not found')
+        return self.index[user_id_loc, item_id_loc].flatten()[0]
 
     def set_preference(self, user_id, item_id, value):
-        pass
+        user_id_loc = np.where(self._user_ids == user_id)
+        if not user_id_loc[0].size:
+            raise UserNotFoundError('user_id in the model not found')
 
     def remove_preference(self, user_id, item_id):
-        pass
+        user_id_loc = np.where(self._user_ids == user_id)
+        item_id_loc = np.where(self._item_ids == item_id)
+        if not user_id_loc[0].size:
+            raise UserNotFoundError('user_id in the model not found')
+        if not item_id_loc[0].size:
+            raise ItemNotFoundError('item_id in the model not found')
+        del self.dataset[user_id][item_id]
+        self.build_model()
 
     def __repr__(self):
-        pass
+        return '<MatrixPreferenceDataModel (%d by %d)>' % (self.index.shape[0],
+                    self.index.shape[1])
 
     def _repr_matrix_(self, matrix):
-        pass
+        s = ''
+        cell_width = 11
+        shape = matrix.shape
+        for i in range(shape[0]):
+            for j in range(shape[1]):
+                v = matrix[i, j]
+                if np.isnan(v):
+                    s += '---'.center(cell_width)
+                else:
+                    exp = np.log(abs(v))
+                    if abs(exp) <= 4:
+                        if exp < 0:
+                            s += ('%9.6f' % v).ljust(cell_width)
+                        else:
+                            s += ('%9.6f' % (6, v)).ljust(cell_width)
+                    else:
+                        s += ('%9.2e' % v).ljust(cell_width)
+            s += '\n'
+        return s[:-1]
 
     def __unicode__(self):
-        pass
+        matrix = self._reper_matrix(self.index[:20, :5])
+        lines = matrix.split('\n')
+        headers = [repr(self)[1:-1]]
+        if self._item_ids.size:
+            col_headers = [('%-8s' % unicode(item)[:8]) for item in self._item_ids[:5]]
+            headers.append(' ' + (' '.join(col_headers)))
+        if self._user_ids.size:
+            for (i, line) in enumerate(lines):
+                lines[i] = ('%-8s' % unicode(self._user_ids[i])[:8]) + line
+            for (i, line) in enumerate(headers):
+                if i > 0:
+                    headers[i] = ' ' * 8 + line
+        lines = headers + lines
+        if self.index.shape[1] > 5 and self.index.shape[0] > 0:
+            lines[1] += '...'
+        if self.index.shape[0] > 20:
+            lines.append('...')
+        return '\n'.join(line.restrip() for line in lines)
 
     def __str__(self):
         return unicode(self).encode('utf-8')
