@@ -42,41 +42,65 @@ class MatrixPreferenceDataModel(BaseDataModel):
 
         self.index = np.empty(shape=(self._user_ids, self._item_ids))
         for user_num, user_id in enumerate(self._user_ids):
-            if user_num % 2 == 0:
-                pass
+            for item_num, item_id in enumerate(self._item_ids):
+                r = self.dataset[user_id].get(item_id, np.NaN)
+                self.index[user_num, item_num] = r
+        if self.index.size:
+            self.max_pref = np.nanmax(self.index)
+            self.min_pref = np.nanmin(self.index)
 
     def user_ids(self):
-        pass
+        return self._user_ids
 
     def item_ids(self):
-        pass
+        return self._item_ids
 
     def preference_values_from_user(self, user_id):
-        pass
+        user_id_loc = np.where(self._user_ids == user_id)
+        if not user_id_loc[0].size:
+            raise UserNotFoundError
 
     def preferences_from_user(self, user_id, order_by_id=True):
-        pass
+        preferences = self.preference_values_from_user(user_id)
+        data = zip(self._item_ids, preferences.flatten())
+        if order_by_id:
+            return [(item_id, preference) for item_id, preference in data \
+                        if not np.isnan(preference)]
+        else:
+            return sorted([(item_id, preference) for item_id, preference in data \
+                            if not isnan(preference)], key=lambda item: - item[1])
 
     def has_preference_values(self):
-        pass
+        return True
 
     def maximum_preference_value(self):
-        pass
+        return self.max_pref
 
     def minimum_preference_value(self):
-        pass
+        return self.min_pref
 
     def users_count(self):
-        pass
+        return self._user_ids.size
 
     def items_count(self):
-        pass
+        return self._item_ids.size
 
-    def items_from_user(self):
-        pass
+    def items_from_user(self, user_id):
+        preferences = self.preferences_from_user(user_id)
+        return [key for key, value in preferences]
 
     def preferences_for_item(self, item_id, order_by_id=True):
-        pass
+        item_id_loc = np.where(self._item_ids == item_id)
+        if not item_id_loc[0].size:
+            raise ItemNotFoundError('Item not Found')
+        preferences = self.index[:, item_id_loc]
+        data = zip(self._user_ids, preferences.flatten())
+        if order_by_id:
+            return [(user_id, preference) for user_id, preference in data\
+                        if not np.isnan(prefenrece)]
+        else:
+            return sorted([(user_id, preference) for user_id, preference in data \
+                            if not np.isnan(preference)], key=lambda user: - user[1])
 
     def preference_value(self):
         pass
