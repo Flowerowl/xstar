@@ -135,7 +135,7 @@ class MatrixPreferenceDataModel(BaseDataModel):
         return '<MatrixPreferenceDataModel (%d by %d)>' % (self.index.shape[0],
                     self.index.shape[1])
 
-    def _repr_matrix_(self, matrix):
+    def _repr_matrix(self, matrix):
         s = ''
         cell_width = 11
         shape = matrix.shape
@@ -150,14 +150,14 @@ class MatrixPreferenceDataModel(BaseDataModel):
                         if exp < 0:
                             s += ('%9.6f' % v).ljust(cell_width)
                         else:
-                            s += ('%9.6f' % (6, v)).ljust(cell_width)
+                            s += ('%9.*f' % (6, v)).ljust(cell_width)
                     else:
                         s += ('%9.2e' % v).ljust(cell_width)
             s += '\n'
         return s[:-1]
 
     def __unicode__(self):
-        matrix = self._reper_matrix(self.index[:20, :5])
+        matrix = self._repr_matrix(self.index[:20, :5])
         lines = matrix.split('\n')
         headers = [repr(self)[1:-1]]
         if self._item_ids.size:
@@ -174,7 +174,7 @@ class MatrixPreferenceDataModel(BaseDataModel):
             lines[1] += '...'
         if self.index.shape[0] > 20:
             lines.append('...')
-        return '\n'.join(line.restrip() for line in lines)
+        return '\n'.join(line.rstrip() for line in lines)
 
     def __str__(self):
         return unicode(self).encode('utf-8')
