@@ -1,10 +1,12 @@
 #encoding:utf-8
+from __future__ import unicode_literals, absolute_import
 import logging
 
 import numpy as np
 
 from .base import BaseDataModel
 from .exceptions import UserNotFoundError, ItemNotFoundError
+
 
 logger = logging.getLogger("xstar")
 
@@ -30,7 +32,7 @@ class MatrixPreferenceDataModel(BaseDataModel):
 
         self._item_ids = []
         for item in self.dataset.itervalues():
-            self._item_ids.extend(items.keys())
+            self._item_ids.extend(item.keys())
 
         self._item_ids = np.unique(np.array(self._item_ids))
         self._item_ids.sort()
@@ -41,7 +43,7 @@ class MatrixPreferenceDataModel(BaseDataModel):
         logger.info("creating matrix for %d users and %d items" % \
                     (self._user_ids.size, self._item_ids.size))
 
-        self.index = np.empty(shape=(self._user_ids, self._item_ids))
+        self.index = np.empty(shape=(self._user_ids.size, self._item_ids.size))
         for user_num, user_id in enumerate(self._user_ids):
             for item_num, item_id in enumerate(self._item_ids):
                 r = self.dataset[user_id].get(item_id, np.NaN)
@@ -60,6 +62,8 @@ class MatrixPreferenceDataModel(BaseDataModel):
         user_id_loc = np.where(self._user_ids == user_id)
         if not user_id_loc[0].size:
             raise UserNotFoundError
+        preferences = self.index[user_id_loc]
+        return preferences
 
     def preferences_from_user(self, user_id, order_by_id=True):
         preferences = self.preference_values_from_user(user_id)
@@ -98,18 +102,18 @@ class MatrixPreferenceDataModel(BaseDataModel):
         data = zip(self._user_ids, preferences.flatten())
         if order_by_id:
             return [(user_id, preference) for user_id, preference in data\
-                        if not np.isnan(prefenrece)]
+                        if not np.isnan(preference)]
         else:
             return sorted([(user_id, preference) for user_id, preference in data \
                             if not np.isnan(preference)], key=lambda user: - user[1])
 
-    def preference_value(self):
+    def preference_value(self, user_id, item_id):
         item_id_loc = np.where(self._item_ids == item_id)
         user_id_loc = np.where(self._user_ids == user_id)
         if not user_id_loc[0].size:
             raise UserNotFoundError('user_id in the model not found')
         if not item_id_loc[0].size:
-            rasie ItemNotFoundError('item_id in the model not found')
+            raise ItemNotFoundError('item_id in the model not found')
         return self.index[user_id_loc, item_id_loc].flatten()[0]
 
     def set_preference(self, user_id, item_id, value):

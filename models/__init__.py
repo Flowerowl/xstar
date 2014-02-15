@@ -1,1 +1,1 @@
-from .classes import MatrixPreferenceDataModel
+from classes import MatrixPreferenceDataModel
