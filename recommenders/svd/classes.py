@@ -40,3 +40,22 @@ class MatrixFactorBasedRecommender(SVDRecommender):
         self.item_factors = np.empty(shape=(num_items, self.n_features), dtype=float)
         self.user_factors = self.init_mean * np.random.randn(num_users, self.n_features) + self.init_stdev ** 2
         self.item_factors = self.init_mean * np.random.randn(num_itemn, self.n_features) + self.init_stdev ** 2
+
+    def _get_average_preference(self):
+        if hasattr(self.model, 'index'):
+            mdat = np.ma.masked_array(self.model.index, np.isnan(self.model.index))
+        else:
+            raise TypeError('This model is not yet supported for this recommender.')
+        return np.mean(mdat)
+
+    def _predict(self, user_index, item_index, trailing=True):
+        result = self._global_bias + np.sum(self.user_factors[user_index]
+                                            * self.item_factors[item_index])
+        if trailing:
+            max_preference = self.model.max_preference()
+            min_preference = self.model.min_preference()
+            if result > max_preference:
+                max_preference = result
+            elif result < min_preference:
+                min_preference = result
+        return result
