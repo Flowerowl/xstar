@@ -50,4 +50,27 @@ class ItemBasedRecommender(ItemRecommender):
         return self.items_selection_strategy.candidate_items(user_id, self.model)
 
     def _top_matches(self, source_id, target_ids, how_many=None, **params):
-        pass
+        if target_ids.size == 0:
+            return np.array([])
+        estimate_preference = np.vectorize(self.estimate_preference)
+        preferences = estimate_preference(source_id, target_ids)
+        preference_values = preference[~np.isnan(preferences)]
+        target_ids = target_ids[~np.isnan(preferences)]
+        sorted_preference = np.lexsort((preference_values,))[::-1]
+        sorted_preference = sorted_preference[0:how_many] \
+            if how_many and sorted_preference.size > how_many \
+                else sorted_preference
+        if self.with_preference:
+            top_n_recs = [(target_ids[ind], preferences[ind] for ind in sorted_preference)]
+        else:
+            top_n_recs = [target_ids[ind] for ind in sorted_preference]
+        return top_n_recs
+
+    def most_similar_items(self, item_id, how_many=None):
+        old_how_many = self.similarity.num_best
+        self.similarity.num_best = how_many + 1 \
+            if how_many is not None else None
+        similarities = self.similarity[item_id]
+        self.similarity.num_best = old_how_many
+        return np.array([item for item, pref in similarities \
+            if item != item_id and not np.isnan(pref)])
