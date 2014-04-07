@@ -1,6 +1,4 @@
 #encoding:utf-8
-
-
 import numpy as np
 import scipy.spatial.distance as ssd
 

@@ -1,14 +1,11 @@
 #encoding:utf-8
 from __future__ import unicode_literals, absolute_import
-import logging
 
 import numpy as np
 
 from .base import BaseDataModel
 from .exceptions import UserNotFoundError, ItemNotFoundError
 
-
-logger = logging.getLogger("xstar")
 
 class MatrixPreferenceDataModel(BaseDataModel):
     def __init__(self, dataset):

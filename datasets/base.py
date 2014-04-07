@@ -12,6 +12,12 @@ class Bunch(dict):
 
 
 def load_movielens100k(load_timestamp=False):
+    """
+    from xstar.datasets import load_movielens100k
+    movies = load_movielens100k()
+    movie['data']
+    movie['item_ids']
+    """
     base_dir = join(dirname(__file__), 'data/')
     if load_timestamp:
         data_m = np.loadtxt(base_dir + 'movielens100k.data',
@@ -22,7 +28,7 @@ def load_movielens100k(load_timestamp=False):
             data_movies[user_id][item_id] = (timestamp, int(rating))
     else:
         data_m = np.loadtxt(base_dir + 'movielens100k.data',
-                        dalimiter='\t', usecols=(0, 1, 2), dtype=int)
+                        delimiter='\t', usecols=(0, 1, 2), dtype=int)
         data_movies = {}
         for user_id, item_id, rating in data_m:
             data_movies.setdefault(user_id, {})

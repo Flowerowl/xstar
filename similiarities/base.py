@@ -1,6 +1,4 @@
 #encoding:utf-8
-from __future__ import unicode_literals
-
 import numpy as np
 
 
@@ -21,7 +19,7 @@ class BaseSimiliarity(object):
 
     def __getitem__(self, source_id):
         similiar_items = self.get_similiarities(source_id)
-        tops= sorted(similiar_items, key = lambda x: -x[1])
+        tops = sorted(similiar_items, key=lambda x: -x[1])
         if similiar_items:
             item_ids, preferences = zip(*similiar_items)
             item_ids = np.array(item_ids).flatten()
