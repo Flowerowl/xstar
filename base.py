@@ -2,7 +2,7 @@
 from scikits.learn.base import BaseEstimator
 
 
-class BaseRecommend(BaseEstimator):
+class BaseRecommender(BaseEstimator):
     def __init__(self, model, with_preference=False):
         self.model = model
         self.with_preference = with_preference

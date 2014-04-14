@@ -1,9 +1,9 @@
 # encoding:utf-8
 from __future__ import unicode_literals
 
-from base import BaseUserNeighborhoodStrategy
+from .base import BaseUserNeighborhoodStrategy
 import numpy as np
-from ...similarities.basic_similarities import UserSimilarity
+from ...similarities.similarities import UserSimilarity
 from ...metrics.pairwise import euclidean_distances
 
 

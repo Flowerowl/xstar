@@ -14,7 +14,7 @@ class MatrixPreferenceDataModel(BaseDataModel):
         self.build_model()
 
     def __getitem__(self, user_id):
-        return self.preference_from_user(user_id)
+        return self.preferences_from_user(user_id)
 
     def __iter__(self):
         for index, user in enumerate(self.user_ids()):
@@ -36,9 +36,6 @@ class MatrixPreferenceDataModel(BaseDataModel):
 
         self.max_pref = -np.inf
         self.min_pref = np.inf
-
-        logger.info("creating matrix for %d users and %d items" % \
-                    (self._user_ids.size, self._item_ids.size))
 
         self.index = np.empty(shape=(self._user_ids.size, self._item_ids.size))
         for user_num, user_id in enumerate(self._user_ids):

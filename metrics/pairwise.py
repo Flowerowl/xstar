@@ -81,7 +81,7 @@ def sorensen_coefficient(X, Y):
 
 
 def tanimoto_coefficient(X, Y):
-    is X is Y:
+    if X is Y:
         X = Y = np.asanyarray(X)
     else:
         X = np.asanyarray(X)
@@ -92,10 +92,10 @@ def tanimoto_coefficient(X, Y):
         result.append([])
         for arrayY in Y:
             n_XY = np.intersect1d(arrayY, arrayX).size
-            result[i].append(n_XY / (float(len(arrayX) + len(arrayY))
+            result[i].append(n_XY / (float(len(arrayX)) + len(arrayY) - n_XY))
         result[i] = np.array(result[i])
         i += 1
-    return np.array(result))
+    return np.array(result)
 
 
 def cosine_distances(X, Y):

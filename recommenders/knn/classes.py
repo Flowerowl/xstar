@@ -1,9 +1,9 @@
 # encoding:utf-8
 from __future__ import unicode_literals
 
-from base import ItemRecommender, UserRecommender
-from item_strategies import ItemsNeighborhoodStrategy
-from neighborhood_strategies import NearestNeighborsStrategy
+from .base import ItemRecommender, UserRecommender
+from .item_strategies import ItemsNeighborhoodStrategy
+from .neighborhood_strategies import NearestNeighborsStrategy
 import numpy as np
 
 

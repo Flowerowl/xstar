@@ -18,30 +18,36 @@ def find_common_elements(source, target):
         return np.asarray([[]]), np.asarray([[]])
 
 
-class UserSimiliarity(BaseSimiliarity):
+class UserSimilarity(BaseSimiliarity):
     def __init__(self, model, distance, number=None):
         BaseSimiliarity.__init__(self, model, distance, number)
 
     def get_similarity(self, source_id, target_id):
         source_preferences = self.model.preferences_from_user(source_id)
         target_preferences = self.model.preferences_from_user(target_id)
+
         if self.model.has_preference_values():
             source_preferences, target_preferences = \
                 find_common_elements(source_preferences, target_preferences)
+
         if source_preferences.ndim == 1 and target_preferences.ndim == 1:
             source_preferences = np.asarray([source_preferences])
             target_preferences = np.asarray([target_preferences])
+
         if self.distance == loglikehood_coefficient:
-            return self.distance(self.model.item_count(), \
-                source_preferences, target_preferences, \
+            return self.distance(self.model.items_count(), \
+                source_preferences, target_preferences) \
                 if not source_preferences.shape[1] == 0 and \
-                not target_preferences.shape[1] == 0 else np.array([[np.nan]]))
-        return self.distance(source_preferences, target_preferences) \
-            if not source_preferences.shape[1] == 0 and \
                 not target_preferences.shape[1] == 0 else np.array([[np.nan]])
 
+        import pdb;pdb.set_trace()
+        return self.distance(source_preferences, target_preferences) \
+            if not source_preferences.shape[1] == 0 \
+                and not target_preferences.shape[1] == 0 else np.array([[np.nan]])
+
     def get_similarities(self, source_id):
-        return [(other_id, self.get_similarity(source_id, other_id)) for other_id, v in self.model]
+        return [(other_id, self.get_similarity(source_id, other_id))\
+            for other_id, v in self.model]
 
     def __iter__(self):
         for source_id, preferences in self.model:

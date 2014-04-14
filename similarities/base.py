@@ -18,9 +18,9 @@ class BaseSimiliarity(object):
         raise NotImplementedError('cannot instantiate Abstract Base Class')
 
     def __getitem__(self, source_id):
-        similiar_items = self.get_similiarities(source_id)
+        similar_items = self.get_similarities(source_id)
         tops = sorted(similiar_items, key=lambda x: -x[1])
-        if similiar_items:
+        if similar_items:
             item_ids, preferences = zip(*similiar_items)
             item_ids = np.array(item_ids).flatten()
             sorted_prefs = np.argsort(-preferences)
