@@ -2,7 +2,7 @@
 import numpy as np
 
 
-class BaseSimiliarity(object):
+class BaseSimilarity(object):
     def __init__(self, model, distance, number=None):
         self.model = model
         self.distance = distance
@@ -19,9 +19,10 @@ class BaseSimiliarity(object):
 
     def __getitem__(self, source_id):
         similar_items = self.get_similarities(source_id)
-        tops = sorted(similiar_items, key=lambda x: -x[1])
+        tops = sorted(similar_items, key=lambda x: -x[1])
         if similar_items:
-            item_ids, preferences = zip(*similiar_items)
+            item_ids, preferences = zip(*similar_items)
+            preferences = np.array(preferences).flatten()
             item_ids = np.array(item_ids).flatten()
             sorted_prefs = np.argsort(-preferences)
             tops = zip(item_ids[sorted_prefs], preferences[sorted_prefs])
