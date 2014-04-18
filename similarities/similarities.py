@@ -1,7 +1,6 @@
 #-*- coding:utf-8 -*-
 import numpy as np
 from base import BaseSimilarity
-from ..metrics.pairwise import loglikehood_coefficient
 
 
 def find_common_elements(source_preferences, target_preferences):
@@ -35,13 +34,6 @@ class UserSimilarity(BaseSimilarity):
             source_preferences = np.asarray([source_preferences])
             target_preferences = np.asarray([target_preferences])
 
-        if self.distance == loglikehood_coefficient:
-            return self.distance(self.model.items_count(), \
-                source_preferences, target_preferences) \
-                if not source_preferences.shape[1] == 0 and \
-                not target_preferences.shape[1] == 0 else np.array([[np.nan]])
-
-        #evaluate the similarity between the two users vectors.
         return self.distance(source_preferences, target_preferences) \
             if not source_preferences.shape[1] == 0 \
                 and not target_preferences.shape[1] == 0 else np.array([[np.nan]])
@@ -60,7 +52,6 @@ class ItemSimilarity(BaseSimilarity):
         BaseSimilarity.__init__(self, model, distance, num_best)
 
     def get_similarity(self, source_id, target_id):
-        import pdb;pdb.set_trace()
         source_preferences = self.model.preferences_for_item(source_id)
         target_preferences = self.model.preferences_for_item(target_id)
 
@@ -72,13 +63,6 @@ class ItemSimilarity(BaseSimilarity):
             source_preferences = np.asarray([source_preferences])
             target_preferences = np.asarray([target_preferences])
 
-        if self.distance == loglikehood_coefficient:
-            return self.distance(self.model.items_count(), \
-                source_preferences, target_preferences) \
-                if not source_preferences.shape[1] == 0 and \
-                    not target_preferences.shape[1] == 0 else np.array([[np.nan]])
-
-        #Evaluate the similarity between the two users vectors.
         return self.distance(source_preferences, target_preferences) \
             if not source_preferences.shape[1] == 0 and \
                 not target_preferences.shape[1] == 0 else np.array([[np.nan]])
