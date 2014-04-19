@@ -7,6 +7,7 @@ def find_common_elements(source_preferences, target_preferences):
     src = dict(source_preferences)
     tgt = dict(target_preferences)
 
+    #找出交集id
     inter = np.intersect1d(src.keys(), tgt.keys())
 
     common_preferences = zip(*[(src[item], tgt[item]) for item in inter \
@@ -52,10 +53,13 @@ class ItemSimilarity(BaseSimilarity):
         BaseSimilarity.__init__(self, model, distance, num_best)
 
     def get_similarity(self, source_id, target_id):
+        #所有用户对此item的打分[('Lorena Abreu', 3.0),..]
         source_preferences = self.model.preferences_for_item(source_id)
         target_preferences = self.model.preferences_for_item(target_id)
 
         if self.model.has_preference_values():
+            #source_preferences array([[ 3. ,  3. ,  1.5,  2. ]])
+            #target_preferences array([[ 3.5,  3.5,  3.5,  4. ]])
             source_preferences, target_preferences = \
                 find_common_elements(source_preferences, target_preferences)
 
@@ -63,6 +67,7 @@ class ItemSimilarity(BaseSimilarity):
             source_preferences = np.asarray([source_preferences])
             target_preferences = np.asarray([target_preferences])
 
+        #array([[-0.33333333]])
         return self.distance(source_preferences, target_preferences) \
             if not source_preferences.shape[1] == 0 and \
                 not target_preferences.shape[1] == 0 else np.array([[np.nan]])

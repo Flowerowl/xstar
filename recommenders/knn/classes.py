@@ -20,32 +20,43 @@ class ItemBasedRecommender(ItemRecommender):
 
     def recommend(self, user_id, how_many=None, **params):
         self._set_params(**params)
+        #所有可能的item ids
         candidate_items = self.all_other_items(user_id)
         recommendable_items = self._top_matches(user_id, \
                  candidate_items, how_many)
         return recommendable_items
 
     def estimate_preference(self, user_id, item_id, **params):
+        #用户对此item的评分
         preference = self.model.preference_value(user_id, item_id)
         if not np.isnan(preference):
             return preference
+        #用户所有评分[('Snakes on a Plane', 4.5),..]
         prefs = self.model.preferences_from_user(user_id)
         if not self.model.has_preference_values():
             prefs = [(pref, 1.0) for pref in prefs]
-        similarities = \
-            np.array([self.similarity.get_similarity(item_id, to_item_id) \
+
+        #array([-0.33333333, -0.42289003, -0.48566186])
+        similarities = np.array([self.similarity.get_similarity(item_id, to_item_id) \
             for to_item_id, pref in prefs if to_item_id != item_id]).flatten()
+        #array([ 4.5,  4. ,  1. ])
         prefs = np.array([pref for it, pref in prefs])
+        #-3.6772219907013066
         prefs_sim = np.sum(prefs[~np.isnan(similarities)] *
                              similarities[~np.isnan(similarities)])
+        #-1.241885229201547
         total_similarity = np.sum(similarities)
         if total_similarity == 0.0 or \
            not similarities[~np.isnan(similarities)].size:
             return np.nan
+        #2.9609998607242685
         estimated = prefs_sim / total_similarity
         if self.capper:
+            #5.0
             max_p = self.model.maximum_preference_value()
+            #1.0
             min_p = self.model.minimum_preference_value()
+            #2.9609998607242685
             estimated = max_p if estimated > max_p else min_p \
                      if estimated < min_p else estimated
         return estimated
@@ -58,10 +69,13 @@ class ItemBasedRecommender(ItemRecommender):
         if target_ids.size == 0:
             return np.array([])
         estimate_preferences = np.vectorize(self.estimate_preference)
+        #array([ 2.96099986,  3.61003107,  3.53139503])
         preferences = estimate_preferences(source_id, target_ids)
+        #array([ 2.96099986,  3.61003107,  3.53139503])
         preference_values = preferences[~np.isnan(preferences)]
         target_ids = target_ids[~np.isnan(preferences)]
         sorted_preferences = np.lexsort((preference_values,))[::-1]
+        #array([1, 2, 0])
         sorted_preferences = sorted_preferences[0:how_many] \
              if how_many and sorted_preferences.size > how_many \
                 else sorted_preferences
@@ -71,6 +85,7 @@ class ItemBasedRecommender(ItemRecommender):
         else:
             top_n_recs = [target_ids[ind]
                  for ind in sorted_preferences]
+        #['Lady in the Water', 'The Night Listener']
         return top_n_recs
 
     def most_similar_items(self, item_id, how_many=None):
@@ -187,6 +202,8 @@ class UserBasedRecommender(UserRecommender):
     def _top_matches(self, source_id, target_ids, how_many=None, **params):
         if target_ids.size == 0:
             return np.array([])
+        #关于np.vectorize
+        #ref: http://docs.scipy.org/doc/numpy/reference/generated/numpy.vectorize.html
         estimate_preferences = np.vectorize(self.estimate_preference)
         preferences = estimate_preferences(source_id, target_ids)
         preference_values = preferences[~np.isnan(preferences)]

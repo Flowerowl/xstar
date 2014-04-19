@@ -11,7 +11,7 @@ class ItemRecommender(MemoryBasedRecommender):
 
 
 class UserRecommender(MemoryBasedRecommender):
-    def most_similar_items(self, user_id, how_many=None):
+    def most_similar_users(self, user_id, how_many=None):
         raise NotImplementError('UserRecommender is an abstract class.')
 
     def recommend_because(self, user_id, item_id, how_many, **params):
