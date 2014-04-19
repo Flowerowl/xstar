@@ -1,1 +1,1 @@
-from .classes import ItemBasedRecommender, UserBasedRecommender
+from .recommenders import ItemBasedRecommender, UserBasedRecommender
