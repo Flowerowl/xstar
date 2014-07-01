@@ -11,11 +11,11 @@ def find_common_elements(source_preferences, target_preferences):
     inter = np.intersect1d(src.keys(), tgt.keys())
 
     common_preferences = zip(*[(src[item], tgt[item]) for item in inter \
-            if not np.isnan(src[item]) and not np.isnan(tgt[item])])
+        if not np.isnan(src[item]) and not np.isnan(tgt[item])])
     if common_preferences:
         return np.asarray([common_preferences[0]]), np.asarray([common_preferences[1]])
     else:
-            return np.asarray([[]]), np.asarray([[]])
+        return np.asarray([[]]), np.asarray([[]])
 
 
 class UserSimilarity(BaseSimilarity):
@@ -24,7 +24,10 @@ class UserSimilarity(BaseSimilarity):
         BaseSimilarity.__init__(self, model, distance, num_best)
 
     def get_similarity(self, source_id, target_id):
+        #import pdb;pdb.set_trace()
+        #本用户的物品评分
         source_preferences = self.model.preferences_from_user(source_id)
+        #目标用户的物品评分
         target_preferences = self.model.preferences_from_user(target_id)
 
         if self.model.has_preference_values():
@@ -40,6 +43,7 @@ class UserSimilarity(BaseSimilarity):
                 and not target_preferences.shape[1] == 0 else np.array([[np.nan]])
 
     def get_similarities(self, source_id):
+        #import pdb;pdb.set_trace()
         return[(other_id, self.get_similarity(source_id, other_id))  for other_id, v in self.model]
 
     def __iter__(self):
