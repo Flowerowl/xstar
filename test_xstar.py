@@ -1,9 +1,9 @@
 #encoding:utf-8
-from xstar.models import MatrixPreferenceDataModel
-from xstar.metrics import pearson_correlation
-from xstar.similarities import UserSimilarity, ItemSimilarity
-from xstar.recommenders.knn import UserBasedRecommender, ItemBasedRecommender
+from __future__ import unicode_literals
 
+from xstar.xstar import (
+    DataModel, UserSimilarity, UserBasedRecommender, pearson_correlation,
+)
 
 data = {
     'Marcel Caraciolo': {'Lady in the Water': 2.5, \
@@ -28,10 +28,7 @@ data = {
     'Superman Returns':4.0}, \
     'Maria Gabriela': {}
 }
-model = MatrixPreferenceDataModel(data)
-#similarity = UserSimilarity(model, pearson_correlation)
-#recommender = UserBasedRecommender(model, similarity, with_preference=True)
-#print recommender.recommend('Penny Frewman')
-similarity = ItemSimilarity(model, pearson_correlation)
-recommender = ItemBasedRecommender(model, similarity, with_preference=True)
-print recommender.recommend('Just My Luck')
+model = DataModel(data)
+similarity = UserSimilarity(model, pearson_correlation)
+recommender = UserBasedRecommender(model, similarity, with_preference=True)
+print recommender.recommend('Penny Frewman')
